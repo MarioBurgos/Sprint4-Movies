@@ -1,17 +1,3 @@
-// My functions
-function moviesAverage(array) {
-    let avg = 0;
-    let count = 0;
-    array.forEach(m => {
-        if (m.score != 0) {
-            avg += parseFloat(m.score);
-            count++;
-        }
-    });
-    avg /= count;
-    return avg;
-} //
-
 // Exercise 1: Get the array of all directors.
 function getAllDirectors(array) {
     const result = array.map(item => item.director);
@@ -34,7 +20,7 @@ function moviesAverageOfDirector(array, director) {
 // Exercise 4:  Alphabetic order by title 
 function orderAlphabetically(array) {
     let result = [];
-    let movies = Array.from(array); // cloning array
+    let movies = [...array]; // cloning array
     movies = movies.sort((a, b) => { // sorting alphabetically
         return a.title > b.title ? 1 : -1;
     });
@@ -46,7 +32,7 @@ function orderAlphabetically(array) {
 
 // Exercise 5: Order by year, ascending
 function orderByYear(array) {
-    let result = Array.from(array); //cloning array
+    let result = [...array]; //cloning array
     result = result.sort((a, b) => { // sort by year asc
         return a.year > b.year ? 1 : -1;
     });
@@ -68,38 +54,28 @@ function moviesAverageByCategory(array, genre) {
     })
     return moviesAverage(movies);
 }
-
+//
 // Exercise 7: Modify the duration of movies to minutes
 function hoursToMinutes(array) {
-    let split;
-    let hh = 0;
-    let mm = 0;
-
-    let result = Array.from(array); //cloning the original array
-
-    result = result.map(item => {
-        time = item.duration;
-        console.log(time);
-        split = time.split(' ');
-        hh = split[0];
-        hh = hh.split('h');
-        hh = hh[0];
-        mm = split[1];
-        mm = mm.split('min');
-        mm = mm[0];
-        item.duration = (parseInt(hh) * 60) + parseInt(mm);
-        // console.log(item.duration)
+    let result = array.slice();
+    let minutes = result.map(item => {
+        item.duration = transformToMinutes(item.duration);
+        console.log(item.score + ' [type]: ' + typeof item.duration)
+        return item;
     });
-
-    return result;
+    console.log(array);
+    console.log(minutes);
+    minutes.sort((a, b) => { // sort by year asc
+        return a.year > b.year ? 1 : -1;
+    });
+    return minutes;
 }
 
 // Exercise 8: Get the best film of a year
 function bestFilmOfYear(array, year) {
     let result = array.filter(item => { return item.year == year });
-    result = result.sort((a, b) => a.score > b.score ? -1 : 1);
-
-    return result;
+    let best = result.sort((a, b) => a.score > b.score ? -1 : 1).splice(0, 1);
+    return best;
 }
 
 
@@ -116,4 +92,44 @@ if (typeof module !== 'undefined') {
         hoursToMinutes,
         bestFilmOfYear,
     };
+}
+
+// My functions
+/** Gets an array of numeric values and does the average. */
+function moviesAverage(array) {
+    let avg = 0;
+    let count = 0;
+    array.forEach(m => {
+        if (m.score != 0) {
+            avg += parseFloat(m.score);
+            count++;
+        }
+    });
+    avg /= count;
+    return avg;
+}
+/** The function gets a string like: "0h 34min", "24h 60min" or "2h".  If get any different value ('1day 2h 42min', for example), it will crash. 
+ * Transforms the string to minutes and then return the numeric value
+ */
+function transformToMinutes(value) {
+    let valueAsArray = Array.from(value);
+    let minutes = 0;
+
+    if (valueAsArray.includes(' ')) {
+        split = value.split(' ');
+        hh = split[0];
+        mm = split[1];
+    } else {
+        hh = String(value);
+        mm = '0min';
+    }
+    // console.log(hh + ':' + mm);
+    hh = hh.split('h');
+    hh = hh[0];
+    mm = mm.split('min');
+    mm = mm[0];
+    // console.log(hh + ':' + mm);
+    minutes = (parseInt(hh) * 60) + parseInt(mm);
+    // console.log(minutes);
+    return minutes;
 }
